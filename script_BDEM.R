@@ -73,6 +73,13 @@ table(dados_sim_2$IDADE) # Idade 999, provavelmente NA
 # Verifique o dicionário do SIM para identificar qual o código das categorias de cada variável
 # Em variáveis quantitativas como IDADE verificar se existem valores como 9999 para NA
 
+dados_sim_2$IDADE[dados_sim_2$IDADE == 999] <- NA
+
+dados_sim_2$SEXO[dados_sim_2$SEXO == 0] <- NA
+
+dados_sim_2$ESC2010[dados_sim_2$ESC2010 == 9] <- NA
+
+dados_sim_2$ESC2010[dados_sim_2$TPMORTEOCO == 9] <- NA
 
 # Ao terminar a Tarefa 5 commit com a mensagem "script BDEM - SIM - tarefas 1 a 5" e envie para o repositório Projeto_BDEM_2016
 
