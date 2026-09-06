@@ -35,6 +35,8 @@ dados_sim_1 <- dados_sim[, c(1, 3, 9, 10, 11, 14, 17, 35, 47)]
 # 25: PB, 26: PE, 27: AL, 28: SE, 29: BA, 31: MG, 32: ES, 33: RJ, 35: SP, 41: PR, 42: SC, 43: RS
 # 50: MS, 51: MT, 52: GO, 53: DF
 
+dados_sim_2 <- dados_sim_1[substr(dados_sim_1$CODMUNRES, 1, 2) == "31", ]
+
 # observar abaixo o número de óbitos por UF de residência para certificar-se que seu banco de dados está correto
 # 11:8344      12:3763     13:16799    14:2157      15:38557     16:2995     17:7490
 # 21:34362     22:19187    23:54276    24:21922     25:28041     26:66928    27:20769    28:13516     29:88094
@@ -42,6 +44,7 @@ dados_sim_1 <- dados_sim[, c(1, 3, 9, 10, 11, 14, 17, 35, 47)]
 # 41:74740     42:40270    43:87583
 # 50:16749     51:17535    52:38074    53:12050 
 
+str(dados_sim_2)
 
 # Ao terminar a Tarefa 3 commit com a mensagem "script BDEM - SIM - tarefas 1 a 3" e envie para o repositório Projeto_BDEM_2016
 
