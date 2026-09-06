@@ -56,6 +56,14 @@ str(dados_sim_2)
 # Atenção: a unidade de medida de IDADE no DICIONÀRIO do SIM está errada
 # O propósito das avaliações acima é verificar se as categorias estão de acordo com o dicionário do SIM ou se aparecem categorias estranhas
 
+table(dados_sim_2$TIPOBITO) # Em todos os registros é 2 (?)
+table(dados_sim_2$SEXO) # 0? Provavelmente NA
+table(dados_sim_2$RACACOR)
+table(dados_sim_2$ESC2010)
+table(dados_sim_2$TPMORTEOCO)
+table(dados_sim_2$CAUSABAS)
+
+table(dados_sim_2$IDADE) # Idade 999, provavelmente NA
 
 # Ao terminar a Tarefa 4 commit com a mensagem "script BDEM - SIM - tarefas 1 a 4" e envie para o repositório Projeto_BDEM_2016
 
