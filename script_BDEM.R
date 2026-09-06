@@ -90,6 +90,11 @@ dados_sim_2$ESC2010[dados_sim_2$TPMORTEOCO == 9] <- NA
 # ATENçÃO: 1. Na hora de escrever os labels, somente a PRIMEIRA LETRA da legenda é maiúscula. Exemplo para SEXO: Feminino e Masculino
 #          2. Nesta Tarefa 6 não crie novas variáveis dentro do banco de dados
 
+dados_sim_2$SEXO = factor(dados_sim_2$SEXO, levels = c(1,2), labels = c("Masculino", "Feminino"))
+dados_sim_2$TIPOBITO = factor(dados_sim_2$TIPOBITO, levels = c(1,2), labels = c("Fetal", "Não fetal"))
+dados_sim_2$RACACOR = factor(dados_sim_2$RACACOR, levels = 1:5, labels = c("Branca", "Preta", "Amarela", "Parda", "Indígena"))
+dados_sim_2$ESC2010 = factor(dados_sim_2$ESC2010, levels = 0:5, labels = c("Sem escolaridade", "Fundamental I (1° a 4° série)", "Fundamental II (5° a 8° série)", "Médio (antigo 2° Grau)", "Superior incompleto", "Superior completo"))
+dados_sim_2$TPMORTEOCO = factor(dados_sim_2$TPMORTEOCO, levels = c(1:5, 8), labels = c("na gravidez", "no parto", "no abortamento", "até 42 dias após o término do parto", "de 43 dias a 1 ano após o término da gestação", "não ocorreu nestes períodos"))
 
 # Ao terminar a Tarefa 6 commit com a mensagem "script BDEM - SIM - tarefas 1 a 6" e envie para o repositório Projeto_BDEM_2016
 
