@@ -349,7 +349,7 @@ SIM_MG <- rbind(UF, SIM_MG)
 
 # Ao terminar a Tarefa 8 fazer um commit com o comentário "dados SIM_UF 2016 e script - SIM - tarefas 1 a 8"  e envie para o repositório Projeto_BDEM_2016
 
-
+write.csv2(SIM_MG, file = "SIM_MG.csv", row.names = FALSE)
 
 ####################################
 # ETAPA 2: BANCO DE DADOS DO SINASC
