@@ -372,6 +372,7 @@ names(dados_sinasc) <- toupper(names(dados_sinasc))
 # Nomes das respectivas variáveis: CODMUNNASC, LOCNASC, IDADEMAE, ESTCIVMAE, CODMUNRES, GESTACAO, GRAVIDEZ, PARTO, 
 # SEXO, APGAR5, RACACOR, PESO, IDANOMAL, ESCMAE2010, RACACORMAE, SEMAGESTAC, TPAPRESENT, TPROBSON, PARIDADE, KOTELCHUCK, CONTADOR
 
+dados_sinasc_1 <- dados_sinasc[, c(3,4,5,6,11,12,13,14,18,20,21,22,23,34,37,43,47,58,59,60,61)]
 
 # Ao terminar a Tarefa 2 commit com a mensagem "script BDEM - SINASC - tarefas 1 a 2" e envie para o repositório Projeto_BDEM_2016
 
