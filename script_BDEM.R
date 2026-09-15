@@ -492,6 +492,30 @@ dados_sinasc_2$KOTELCHUCK = factor(dados_sinasc_2$KOTELCHUCK, levels = 1:5, labe
 # nova variável: dados_sinasc_2$ESTCIV: Sem companheiro: ESTCIVMAE 1, 3 ou 4, Com companheiro: ESTCIVMAE 2 ou 5
 # Ao categorizar as variáveis, garantir que sejam transformadas em tipo fator
 
+dados_sinasc_2$F_APGAR5 = ifelse(dados_sinasc_2$APGAR5 < 7, 0, 1)
+dados_sinasc_2$F_APGAR5 = factor(dados_sinasc_2$F_APGAR5, levels = 0:1, labels = c("Baixo", "Normal"))
+
+dados_sinasc_2$PEREG = ifelse(dados_sinasc_2$CODMUNNASC == dados_sinasc_2$CODMUNRES, 0, 1)
+dados_sinasc_2$PEREG = factor(dados_sinasc_2$PEREG, levels = 0:1, labels = c("Não", "Sim"))
+
+dados_sinasc_2$ESTCIV = ifelse(as.integer(dados_sinasc_2$ESTCIVMAE) == 2 | as.integer(dados_sinasc_2$ESTCIVMAE) == 5, 1, 0)
+dados_sinasc_2$ESTCIV = factor(dados_sinasc_2$ESTCIV, levels = 0:1, labels = c("Sem companheiro", "Com companheiro"))
+
+dados_sinasc_2$F_PESO <- 1
+dados_sinasc_2$F_PESO[dados_sinasc_2$PESO < 2500] <- 0
+dados_sinasc_2$F_PESO[dados_sinasc_2$PESO >= 4000] <- 2
+dados_sinasc_2$F_PESO = factor(dados_sinasc_2$F_PESO, levels = 0:2, labels = c("Baixo peso", "Peso normal", "Macrossomia"))
+
+dados_sinasc_2$F_IDADE[dados_sinasc_2$IDADEMAE < 15] <- 0
+dados_sinasc_2$F_IDADE[dados_sinasc_2$IDADEMAE >= 15 & dados_sinasc_2$IDADEMAE <= 19] <- 1
+dados_sinasc_2$F_IDADE[dados_sinasc_2$IDADEMAE >= 20 & dados_sinasc_2$IDADEMAE <= 24] <- 2
+dados_sinasc_2$F_IDADE[dados_sinasc_2$IDADEMAE >= 25 & dados_sinasc_2$IDADEMAE <= 29] <- 3
+dados_sinasc_2$F_IDADE[dados_sinasc_2$IDADEMAE >= 30 & dados_sinasc_2$IDADEMAE <= 34] <- 4
+dados_sinasc_2$F_IDADE[dados_sinasc_2$IDADEMAE >= 35 & dados_sinasc_2$IDADEMAE <= 39] <- 5
+dados_sinasc_2$F_IDADE[dados_sinasc_2$IDADEMAE >= 40 & dados_sinasc_2$IDADEMAE <= 44] <- 6
+dados_sinasc_2$F_IDADE[dados_sinasc_2$IDADEMAE >= 45 & dados_sinasc_2$IDADEMAE <= 49] <- 7
+dados_sinasc_2$F_IDADE[dados_sinasc_2$IDADEMAE >= 50] <- 8
+dados_sinasc_2$F_IDADE = factor(dados_sinasc_2$F_IDADE, levels = 0:8, labels = c("<15", "15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49", "50+"))
 
 # Ao terminar a Tarefa 7 commit com a mensagem "script BDEM - SINASC - tarefas 1 a 7" e envie para o repositório Projeto_BDEM_2016
 
