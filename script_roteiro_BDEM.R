@@ -16,6 +16,7 @@
 # Tarefa 1. Leitura do banco de dados SIM_2016 com 1309774 linhas e 87 colunas com o nome de dados_sim
 # Verificar se a leitura foi feita corretamente e a estrutura dos dados
 
+dados_sim = read.csv("SIM_2016.csv", header = TRUE, sep=";")
 
 # Ao terminar a Tarefa 1 commit com a mensagem "script BDEM - SIM - tarefa 1" e envie para o repositório Projeto_BDEM_2016
 
@@ -24,6 +25,7 @@
 # As colunas serão: 1, 3, 9, 10, 11, 14, 17, 35, 47
 # Nomes das respectivas variáveis: CONTADOR, TIPOBITO, IDADE, SEXO, RACACOR, ESC2010, CODMUNRES, TPMORTEOCO, CAUSABAS
 
+dados_sim_1 <- dados_sim[, c(1, 3, 9, 10, 11, 14, 17, 35, 47)]
 
 # Ao terminar a Tarefa 2 commit com a mensagem "script BDEM - SIM - tarefas 1 a 2" e envie para o repositório Projeto_BDEM_2016
 
@@ -33,6 +35,8 @@
 # 25: PB, 26: PE, 27: AL, 28: SE, 29: BA, 31: MG, 32: ES, 33: RJ, 35: SP, 41: PR, 42: SC, 43: RS
 # 50: MS, 51: MT, 52: GO, 53: DF
 
+dados_sim_2 <- dados_sim_1[substr(dados_sim_1$CODMUNRES, 1, 2) == "31", ]
+
 # observar abaixo o número de óbitos por UF de residência para certificar-se que seu banco de dados está correto
 # 11:8344      12:3763     13:16799    14:2157      15:38557     16:2995     17:7490
 # 21:34362     22:19187    23:54276    24:21922     25:28041     26:66928    27:20769    28:13516     29:88094
@@ -40,6 +44,7 @@
 # 41:74740     42:40270    43:87583
 # 50:16749     51:17535    52:38074    53:12050 
 
+str(dados_sim_2)
 
 # Ao terminar a Tarefa 3 commit com a mensagem "script BDEM - SIM - tarefas 1 a 3" e envie para o repositório Projeto_BDEM_2016
 
@@ -51,6 +56,14 @@
 # Atenção: a unidade de medida de IDADE no DICIONÀRIO do SIM está errada
 # O propósito das avaliações acima é verificar se as categorias estão de acordo com o dicionário do SIM ou se aparecem categorias estranhas
 
+table(dados_sim_2$TIPOBITO) # Em todos os registros é 2 (?)
+table(dados_sim_2$SEXO) # 0? Provavelmente NA
+table(dados_sim_2$RACACOR)
+table(dados_sim_2$ESC2010)
+table(dados_sim_2$TPMORTEOCO)
+table(dados_sim_2$CAUSABAS)
+
+table(dados_sim_2$IDADE) # Idade 999, provavelmente NA
 
 # Ao terminar a Tarefa 4 commit com a mensagem "script BDEM - SIM - tarefas 1 a 4" e envie para o repositório Projeto_BDEM_2016
 
@@ -60,6 +73,13 @@
 # Verifique o dicionário do SIM para identificar qual o código das categorias de cada variável
 # Em variáveis quantitativas como IDADE verificar se existem valores como 9999 para NA
 
+dados_sim_2$IDADE[dados_sim_2$IDADE == 999] <- NA
+
+dados_sim_2$SEXO[dados_sim_2$SEXO == 0] <- NA
+
+dados_sim_2$ESC2010[dados_sim_2$ESC2010 == 9] <- NA
+
+dados_sim_2$ESC2010[dados_sim_2$TPMORTEOCO == 9] <- NA
 
 # Ao terminar a Tarefa 5 commit com a mensagem "script BDEM - SIM - tarefas 1 a 5" e envie para o repositório Projeto_BDEM_2016
 
@@ -70,6 +90,12 @@
 # ATENçÃO: 1. Na hora de escrever os labels, somente a PRIMEIRA LETRA da legenda é maiúscula. Exemplo para SEXO: Feminino e Masculino
 #          2. Nesta Tarefa 6 não crie novas variáveis dentro do banco de dados
 
+dados_sim_2$SEXO = factor(dados_sim_2$SEXO, levels = c(1,2), labels = c("Masculino", "Feminino"))
+dados_sim_2$TIPOBITO = factor(dados_sim_2$TIPOBITO, levels = c(1,2), labels = c("Fetal", "Não fetal"))
+dados_sim_2$RACACOR = factor(dados_sim_2$RACACOR, levels = 1:5, labels = c("Branca", "Preta", "Amarela", "Parda", "Indígena"))
+dados_sim_2$ESC2010 = factor(dados_sim_2$ESC2010, levels = 0:5, labels = c("Sem escolaridade", "Fundamental I (1° a 4° série)", "Fundamental II (5° a 8° série)", "Médio (antigo 2° Grau)", "Superior incompleto", "Superior completo"))
+#dados_sim_2$TPMORTEOCO = factor(dados_sim_2$TPMORTEOCO, levels = c(1:5, 8), labels = c("na gravidez", "no parto", "no abortamento", "até 42 dias após o término do parto", "de 43 dias a 1 ano após o término da gestação", "não ocorreu nestes períodos")) -- CORREÇÃO ABAIXO
+
 
 # Ao terminar a Tarefa 6 commit com a mensagem "script BDEM - SIM - tarefas 1 a 6" e envie para o repositório Projeto_BDEM_2016
 
@@ -77,6 +103,244 @@
 # Tarefa 7. Criar um banco de dados, de nome SIM_UF.csv (Exemplo: SIM_RJ.csv), contendo as variáveis listadas no arquivo “Variáveis - Projeto - Tarefa 7 - SIM.pdf”
 # Atenção: a ordem das variáveis do arquivo deve ser respeitada
 
+# AO FAZER A TAREFA 7, PERCEBI UM ERRO COMETIDO DURANTE A TAREFA 6, ESQUECI DE COLOCAR A PRIMEIRA LETRA MAIÚSCULA NA LEGENDA DA VARIÁVEL TPMORTEOCO. CORRIGIREI ABAIXO E COMENTAREI A LINHA ERRADA...
+
+dados_sim_2$TPMORTEOCO = factor(dados_sim_2$TPMORTEOCO, levels = c(1:5, 8), labels = c("Na gravidez", "No parto", "No abortamento", "Até 42 dias após o término do parto", "De 43 dias a 1 ano após o término da gestação", "Não ocorreu nestes períodos"))
+
+# Não incluirei o UF nas variáveis agora
+
+# Variável TO
+
+TO <- as.data.frame(table(dados_sim_2$CODMUNRES))
+names(TO) <- c("CODMUNRES", "TO")
+
+# Variável TORC
+
+registrosSemNA <- na.omit(dados_sim) # 0 registros completos
+
+TORC <- as.data.frame(table(dados_sim_2$CODMUNRES))
+TORC$Freq <- 0
+names(TORC) <- c("CODMUNRES", "TORC")
+
+# Variável TORCR
+
+registrosSemNA2 <- na.omit(dados_sim_2)
+
+TORCR <- as.data.frame(table(registrosSemNA2$CODMUNRES))
+names(TORCR) <- c("CODMUNRES", "TORCR")
+
+# Função para ajudar nas variáveis que envolvem os códigos do CID-10
+
+causas <- dados_sim_2$CAUSABAS
+
+SelecionarDoencas <- function(nomeVar, lim_inf, lim_sup){
+  Resultado <- dados_sim_2[causas >= lim_inf & causas <= lim_sup,]
+  Resultado <- as.data.frame(table(Resultado$CODMUNRES))
+  names(Resultado) <- c("CODMUNRES", nomeVar)
+  return(Resultado)
+}
+
+# Variável TO_NN
+
+TO_NN <- SelecionarDoencas("TO_NN", "V01", "Y98")
+
+# Variável TO_N
+
+TO_N <- merge(TO, TO_NN, by = "CODMUNRES", all.x = TRUE)
+TO_N[is.na(TO_N)] <- 0
+TO_N$TO_N <- TO_N$TO - TO_N$TO_NN
+TO_N <- TO_N[, -(2:3)]
+
+# Variável TO_CB_I
+
+TO_CB_I <- SelecionarDoencas("TO_CB_I", "A00", "B99")
+
+# Variável TO_CB_N
+
+Tabela1 <- SelecionarDoencas("C00-D48", "C00", "D48")
+Tabela2 <- SelecionarDoencas("D50-D89", "D50", "D89")
+
+TO_CB_N <- merge(Tabela1, Tabela2, all = TRUE)
+TO_CB_N[is.na(TO_CB_N)] <- 0
+
+TO_CB_N$TO_CB_N <- TO_CB_N$`D50-D89` + TO_CB_N$`C00-D48`
+
+TO_CB_N <- TO_CB_N[, -(2:3)]
+
+# Variável TO_CB_C
+
+TO_CB_C <- SelecionarDoencas("TO_CB_C", "I00", "I99")
+
+# Variável TO_CB_R
+
+TO_CB_R <- SelecionarDoencas("TO_CB_R", "J00", "J99")
+
+# Variável TO_CB_O
+
+Temp1 <- merge(TO_CB_I, TO_CB_N, all = TRUE)
+Temp2 <- merge(TO_CB_R, TO_CB_C, all = TRUE)
+Temp3 <- merge(Temp1, Temp2, all = TRUE)
+
+TO_CB_O <- merge(TO_N, Temp3, all = TRUE)
+TO_CB_O[is.na(TO_CB_O)] <- 0
+
+TO_CB_O$TO_CB_O <- TO_CB_O$TO_N - TO_CB_O$TO_CB_I - TO_CB_O$TO_CB_N - TO_CB_O$TO_CB_R - TO_CB_O$TO_CB_C
+
+TO_CB_O <- TO_CB_O[, -(2:6)]
+
+# Variável TO_M
+
+TO_M <- dados_sim_2[dados_sim_2$SEXO == "Masculino",]
+TO_M <- as.data.frame(table(TO_M$CODMUNRES))
+names(TO_M) <- c("CODMUNRES", "TO_M")
+
+# Variável TO_F
+
+TO_F <- merge(TO, TO_M, all = TRUE)
+TO_F$TO_F <- TO_F$TO - TO_F$TO_M
+TO_F <- TO_F[, -(2:3)]
+
+# Variável TO_F_IF
+
+IdadeFertil <- dados_sim_2[dados_sim_2$IDADE >= "415" & dados_sim_2$IDADE <= "449",]
+Sexo <- IdadeFertil[IdadeFertil$SEXO == "Feminino",]
+TO_F_IF <- as.data.frame(table(Sexo$CODMUNRES))
+names(TO_F_IF) <- c("CODMUNRES", "TO_F_IF")
+
+Teste <- dados_sim_2[!is.na(dados_sim_2$TPMORTEOCO),]
+Teste2 <- as.data.frame(table(Teste$CODMUNRES))
+names(Teste2) <- c("CODMUNRES", "TO_F_IF")
+
+# Variável TO_FT
+
+ObitosFetais <- dados_sim_2[dados_sim_2$TIPOBITO == "Fetal",]
+
+TO_FT <- as.data.frame(table(dados_sim_2$CODMUNRES))
+names(TO_FT) <- c("CODMUNRES", "TO_FT")
+
+# Funções para ajudar nas variáveis de informações fetais e neonatais
+
+Idade <- dados_sim_2$IDADE
+RacaCor <- dados_sim_2$RACACOR
+
+SelecionarPorIdade <- function(nomeVar, lim_inf, lim_sup) {
+  Filtro <- dados_sim_2[Idade >= lim_inf & Idade <= lim_sup,]
+  Resultado <- as.data.frame(table(Filtro$CODMUNRES))
+  names(Resultado) <- c("CODMUNRES", nomeVar)
+  return(Resultado)
+}
+
+SelecionarPorRacaCor <- function(nomeVar, raca) {
+  Filtro <- dados_sim_2[RacaCor == raca & Idade >= 0 & Idade <= 227,]
+  Resultado <- as.data.frame(table(Filtro$CODMUNRES))
+  names(Resultado) <- c("CODMUNRES", nomeVar)
+  return(Resultado)
+}
+
+# Variáveis TO_NT até TO_PNTT
+
+TO_NT <- SelecionarPorIdade("TO_NT", 0, 227)
+
+TO_NT_P <- SelecionarPorIdade("TO_NT_P", 0, 206)
+
+TO_NT_T <- SelecionarPorIdade("TO_NT_T", 207, 227)
+
+TO_PNT <- SelecionarPorIdade("TO_PNT", 228, 311)
+
+# Variáveis TONT_B até TONT_I
+
+TONT_B <- SelecionarPorRacaCor("TONT_B", "Branca")
+TONT_PT <- SelecionarPorRacaCor("TONT_PT", "Preta")
+TONT_A <- SelecionarPorRacaCor("TONT_A", "Amarela")
+TONT_PD <- SelecionarPorRacaCor("TONT_PD", "Parda")
+TONT_I <- SelecionarPorRacaCor("TONT_I", "Indígena")
+
+# Função para ajudar nas variáveis de informações maternas
+
+TpMorteOco <- dados_sim_2$TPMORTEOCO
+
+SelecionarPorTpMorte <- function (nomeVar, indices){
+  Filtro <- dados_sim_2[as.integer(TpMorteOco) %in% indices & !is.na(TpMorteOco),]
+  Resultado <- as.data.frame(table(Filtro$CODMUNRES))
+  names(Resultado) <- c("CODMUNRES", nomeVar)
+  return(Resultado)
+}
+
+levels(TpMorteOco) # Para ver os indíces corretos
+# [1] "Na gravidez"                                  
+# [2] "No parto"                                     
+# [3] "No abortamento"                               
+# [4] "Até 42 dias após o término do parto"          
+# [5] "De 43 dias a 1 ano após o término da gestação"
+# [6] "Não ocorreu nestes períodos"
+
+# Variáveis TO_MT até TO_MT_P
+
+TO_MT <- SelecionarPorTpMorte("TO_MT", 1:5)
+TO_MT_DG <- SelecionarPorTpMorte("TO_MT_DG", 1)
+TO_MT_PT <- SelecionarPorTpMorte("TO_MT_PT", 2)
+TO_MT_AB <- SelecionarPorTpMorte("TO_MT_AB", 3)
+TO_MT_42 <- SelecionarPorTpMorte("TO_MT_42", 4)
+TO_MT_43 <- SelecionarPorTpMorte("TO_MT_43", 5)
+TO_MT_P <- SelecionarPorTpMorte("TO_MT_P", 1:4)
+
+# Variável TO_MT_P_I
+
+Filtro <- dados_sim_2[as.integer(TpMorteOco) %in% 1:4 & !is.na(TpMorteOco) & Idade >= 415 & Idade <= 449,]
+TO_MT_P_I <- as.data.frame(table(Filtro$CODMUNRES))
+names(TO_MT_P_I) <- c("CODMUNRES", "TO_MT_P_I")
+
+# Variáveis TO_MT_P_ES até TO_MT_P_ESC
+
+Escolaridade <- dados_sim_2$ESC2010
+
+SelecionarPorEscolaridade <- function(nomeVar, indice_esc){
+  Filtro <- dados_sim_2[as.integer(TpMorteOco) %in% 1:4 & !is.na(TpMorteOco) & as.integer(Escolaridade) == indice_esc,]
+  Resultado <- as.data.frame(table(Filtro$CODMUNRES))
+  names(Resultado) <- c("CODMUNRES", nomeVar)
+  return(Resultado)
+}
+
+levels(Escolaridade)
+# [1] "Sem escolaridade"              
+# [2] "Fundamental I (1° a 4° série)" 
+# [3] "Fundamental II (5° a 8° série)"
+# [4] "Médio (antigo 2° Grau)"        
+# [5] "Superior incompleto"           
+# [6] "Superior completo" 
+
+TO_MT_P_ES <- SelecionarPorEscolaridade("TO_MT_P_ES", 1)
+TO_MT_P_EFI <- SelecionarPorEscolaridade("TO_MT_P_EFI", 2)
+TO_MT_P_EFII <- SelecionarPorEscolaridade("TO_MT_P_EFII", 3)
+TO_MT_P_EM <- SelecionarPorEscolaridade("TO_MT_P_EM", 4)
+TO_MT_P_ESI <- SelecionarPorEscolaridade("TO_MT_P_ESI", 5)
+TO_MT_P_ESC <- SelecionarPorEscolaridade("TO_MT_P_ESC", 6)
+
+# Juntando as variáveis
+
+variaveis <- list(TO, TORC, TORCR, TO_NN, TO_N, TO_CB_I, TO_CB_N, TO_CB_C, TO_CB_R, TO_CB_O, TO_M, TO_F, TO_F_IF, TO_FT, TO_NT, TO_NT_P, TO_NT_T, TO_PNT, TONT_B, TONT_PT, TONT_A, TONT_PD, TONT_I, TO_MT, TO_MT_DG, TO_MT_PT, TO_MT_AB, TO_MT_42, TO_MT_43, TO_MT_P, TO_MT_P_I, TO_MT_P_ES, TO_MT_P_EFI, TO_MT_P_EFII, TO_MT_P_EM, TO_MT_P_ESI, TO_MT_P_ESC)
+
+df1 <- as.data.frame(table(dados_sim_2$CODMUNRES))
+df1$Freq <- NULL
+names(df1) <- "CODMUNRES"
+ANO <- "2016"
+NIVEL <- "MUNICIPIO"
+df1 <- cbind(ANO, NIVEL, df1)
+
+df2 <- Reduce(function (x,y) merge(x,y, all = TRUE, by = "CODMUNRES"), variaveis)
+
+df2[is.na(df2)] <- 0
+
+SIM_MG <- merge(df1, df2)
+
+UF <- SIM_MG[1,]
+UF$NIVEL <- "UF"
+UF$CODMUNRES <- "31"
+
+cols <- sapply(SIM_MG, is.numeric)
+UF[cols] <- colSums(SIM_MG[, cols])
+
+SIM_MG <- rbind(UF, SIM_MG)
 
 # Ao terminar a Tarefa 7 commit com a mensagem "script BDEM - SIM - tarefas 1 a 7" e envie para o repositório Projeto_BDEM_2016
 
@@ -85,7 +349,7 @@
 
 # Ao terminar a Tarefa 8 fazer um commit com o comentário "dados SIM_UF 2016 e script - SIM - tarefas 1 a 8"  e envie para o repositório Projeto_BDEM_2016
 
-
+write.csv2(SIM_MG, file = "SIM_MG.csv", row.names = FALSE)
 
 ####################################
 # ETAPA 2: BANCO DE DADOS DO SINASC
