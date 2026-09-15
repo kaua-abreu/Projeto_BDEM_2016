@@ -398,6 +398,27 @@ dados_sinasc_2 <- dados_sinasc_1[substr(dados_sinasc_1$CODMUNRES, 1, 2) == "31",
 # SEXO, RACACOR, IDANOMAL, ESCMAE2010, RACACORMAE, TPAPRESENT, TPROBSON, PARIDADE, KOTELCHUCK
 # Avalie também os valores das variáveis quantitativas de IDADEMAE, SEMAGESTAC, APGAR5 e PESO
 
+table(dados_sinasc_2$LOCNASC) # Valores 9, possivelmente NA?
+table(dados_sinasc_2$ESTCIVMAE) # Valores 9, possivelmente NA?
+table(dados_sinasc_2$GESTACAO) # Valores 9, possivelmente NA?
+table(dados_sinasc_2$GRAVIDEZ) # Valores 9, possivelmente NA?
+table(dados_sinasc_2$PARTO) # Valores 9, possivelmente NA?
+table(dados_sinasc_2$SEXO) # Valores 0??
+table(dados_sinasc_2$RACACOR)
+table(dados_sinasc_2$IDANOMAL)  # Valores 9, possivelmente NA?
+table(dados_sinasc_2$ESCMAE2010) # Valores 9, possivelmente NA?
+table(dados_sinasc_2$RACACORMAE)
+table(dados_sinasc_2$TPAPRESENT) # Valores 9, possivelmente NA?
+table(dados_sinasc_2$TPROBSON)
+table(dados_sinasc_2$PARIDADE)
+table(dados_sinasc_2$KOTELCHUCK)  # Valores 9, possivelmente NA?
+
+table(dados_sinasc_2$IDADEMAE)
+table(dados_sinasc_2$SEMAGESTAC)
+table(dados_sinasc_2$APGAR5) # Valores 99?
+table(dados_sinasc_2$PESO) # Não consegui ver todos os valores, tentarei outra coisa...
+
+max(dados_sinasc_2$PESO, na.rm = TRUE) # Tem pelo menos um registro com valor 9999, provavelmente NA
 
 # Ao terminar a Tarefa 4 commit com a mensagem "script BDEM - SINASC - tarefas 1 a 4" e envie para o repositório Projeto_BDEM_2016
 
