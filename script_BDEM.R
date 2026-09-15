@@ -429,6 +429,20 @@ max(dados_sinasc_2$PESO, na.rm = TRUE) # Tem pelo menos um registro com valor 99
 # KOTELCHUCK = 9 significa "Não informado"   TPROBSON = 11 significa "Não classificado por falta de informação"
 # Em variáveis quantitativas como IDADEMAE verificar se existem valores como 9999 para NA
 
+NAs9 <- c("LOCNASC", "ESTCIVMAE", "GESTACAO", "GRAVIDEZ", "PARTO", "IDANOMAL", "ESCMAE2010", "TPAPRESENT", "KOTELCHUCK") # Todas as variáveis com NA representado por 9
+
+for (variaveis in NAs9) {
+  dados_sinasc_2[[variaveis]][ dados_sinasc_2[[variaveis]] == 9 ] <- NA
+  print(any( dados_sinasc_2[[variaveis]] == 9 & !is.na(dados_sinasc_2[[variaveis]] ))) # Para ver se o comando funcionou
+}
+
+dados_sinasc_2$SEXO[dados_sinasc_2$SEXO == 0] <- NA
+
+dados_sinasc_2$TPROBSON[dados_sinasc_2$TPROBSON == 11] <- NA
+
+dados_sinasc_2$APGAR5[dados_sinasc_2$APGAR5 == 99] <- NA
+
+dados_sinasc_2$PESO[dados_sinasc_2$PESO == 9999] <- NA
 
 # Ao terminar a Tarefa 5 commit com a mensagem "script BDEM - SINASC - tarefas 1 a 5" e envie para o repositório Projeto_BDEM_2016
 
