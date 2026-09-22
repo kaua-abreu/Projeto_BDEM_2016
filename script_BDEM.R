@@ -320,18 +320,13 @@ TO_MT_P_ESC <- SelecionarPorEscolaridade("TO_MT_P_ESC", 6)
 
 variaveis <- list(TO, TORC, TORCR, TO_NN, TO_N, TO_CB_I, TO_CB_N, TO_CB_C, TO_CB_R, TO_CB_O, TO_M, TO_F, TO_F_IF, TO_FT, TO_NT, TO_NT_P, TO_NT_T, TO_PNT, TONT_B, TONT_PT, TONT_A, TONT_PD, TONT_I, TO_MT, TO_MT_DG, TO_MT_PT, TO_MT_AB, TO_MT_42, TO_MT_43, TO_MT_P, TO_MT_P_I, TO_MT_P_ES, TO_MT_P_EFI, TO_MT_P_EFII, TO_MT_P_EM, TO_MT_P_ESI, TO_MT_P_ESC)
 
-df1 <- as.data.frame(table(dados_sim_2$CODMUNRES))
-df1$Freq <- NULL
-names(df1) <- "CODMUNRES"
 ANO <- "2016"
 NIVEL <- "MUNICIPIO"
-df1 <- cbind(ANO, NIVEL, df1)
 
-df2 <- Reduce(function (x,y) merge(x,y, all = TRUE, by = "CODMUNRES"), variaveis)
+SIM_MG <- Reduce(function (x,y) merge(x,y, all = TRUE, by = "CODMUNRES"), variaveis)
 
-df2[is.na(df2)] <- 0
-
-SIM_MG <- merge(df1, df2)
+SIM_MG[is.na(SIM_MG)] <- 0
+SIM_MG <- cbind(ANO, NIVEL, SIM_MG)
 
 UF <- SIM_MG[1,]
 UF$NIVEL <- "UF"
@@ -526,6 +521,22 @@ dados_sinasc_2$F_IDADE = factor(dados_sinasc_2$F_IDADE, levels = 0:8, labels = c
 # nova variável apenas para casos de GRAVIDEZ Única: dados_sinasc_2$F_PIG: PIG: PESO < PESO_P10, AIG: PESO_P10 <= PESO <= PESO_P90, GIG: PESO > PESO_P90
 # Atenção para casos de NA em SEMAGESTAC, PESO ou SEXO. Lembre-se também que em dados_sinasc_2 SEXO está como fator com as categorias Feminino e Masculino.
 
+tabela_pig <- read.csv(file="Tabela_PIG_Brasil.csv", header=TRUE, sep=";")
+
+teste <- merge(dados_sinasc_2, tabela_pig, by=c("SEMAGESTAC", "SEXO"), all.x = TRUE)
+
+dados_sinasc_2 <- teste
+
+dados_sinasc_2$F_PIG <- ifelse(dados_sinasc_2$PESO < dados_sinasc_2$PESO_P10, "PIG", ifelse(dados_sinasc_2$PESO > dados_sinasc_2$PESO_P90, "GIG", "AIG"))
+
+# Garantindo os NAs
+
+dados_sinasc_2$F_PIG[is.na(dados_sinasc_2$SEMAGESTAC)] <- NA
+dados_sinasc_2$F_PIG[is.na(dados_sinasc_2$SEXO)] <- NA
+dados_sinasc_2$F_PIG[is.na(dados_sinasc_2$PESO)] <- NA
+
+dados_sinasc_2$F_PIG[dados_sinasc_2$GRAVIDEZ != "Única"] <- NA
+dados_sinasc_2$F_PIG[is.na(dados_sinasc_2$GRAVIDEZ)] <- NA
 
 # Ao terminar a Tarefa 8 commit com a mensagem "script BDEM - SINASC - tarefas 1 a 8" e envie para o repositório Projeto_BDEM_2016
 
