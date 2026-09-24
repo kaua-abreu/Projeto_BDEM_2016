@@ -916,7 +916,7 @@ SINASC_MG$NIVEL[SINASC_MG$CODMUNRES == "31"] <- "UF"
 # Tarefa 10. Exportar o banco de dados com o nome SINASC_UF.csv (Exemplo: SINASC_RJ.csv)
 # Ao terminar a Tarefa 10 commit com o comentário "dados SINASC_UF 2016 e script - SIM - tarefas 1 a 10"  e envie para o repositório Projeto_BDEM_2016
 
-
+write.csv2(SINASC_MG, file = "SINASC_MG.csv", row.names = FALSE)
 
 ####################################
 # ETAPA 3: BANCOS DE DADOS DO SIDRA
