@@ -544,6 +544,371 @@ dados_sinasc_2$F_PIG[is.na(dados_sinasc_2$GRAVIDEZ)] <- NA
 # Tarefa 9. Criar um banco de dados, de nome SINASC_UF.csv (Exemplo: SINASC_RJ.csv), contendo as variáveis listadas no arquivo “Variáveis - Projeto - Tarefa 9 - SINASC.pdf”
 # Atenção: a ordem das variáveis do arquivo deve ser respeitada
 
+# Variáveis sobre nascimentos
+
+TN <- as.data.frame(table(dados_sinasc_2$CODMUNRES))
+names(TN) <- c("CODMUNRES", "TN")
+
+dados_originais <- dados_sinasc[substr(dados_sinasc$CODMUNRES, 1, 2) == "31",]
+dadosSemNA <- na.omit(dados_originais) # data frame com 0 registros
+
+TNRC <- TN
+names(TNRC) <- c("CODMUNRES", "TNRC")
+TNRC$TNRC <- 0
+
+teste <- dados_sinasc_1[substr(dados_sinasc_1$CODMUNRES, 1, 2) == "31",] # dados_sinasc_1 já contém nossas variáveis selecionadas
+dadosSemNA2 <- na.omit(teste)
+
+TNRCR <- as.data.frame(table(dadosSemNA2$CODMUNRES))
+names(TNRCR) <- c("CODMUNRES", "TNRCR")
+
+# Variáveis sobre as gestantes
+
+TGI_15 <- dados_sinasc_2[dados_sinasc_2$IDADEMAE < 15,]
+TGI_15 <- as.data.frame(table(TGI_15$CODMUNRES))
+names(TGI_15) <- c("CODMUNRES", "TGI_15")
+
+Idade <- dados_sinasc_2$IDADEMAE
+
+SelecionarPorIdade <- function(lim_inf, lim_sup, nomeVar){
+  temp <- dados_sinasc_2[Idade <= lim_sup & Idade >= lim_inf,]
+  resultado <- as.data.frame(table(temp$CODMUNRES))
+  names(resultado) <- c("CODMUNRES", nomeVar)
+  return(resultado)
+}
+
+TGI_15_19 <- SelecionarPorIdade(15, 19, "TGI_15_19")
+TGI_20_24 <- SelecionarPorIdade(20, 24, "TGI_20_24")
+TGI_25_29 <- SelecionarPorIdade(25, 29, "TGI_25_29")
+TGI_30_34 <- SelecionarPorIdade(30, 34, "TGI_30_34")
+TGI_35_39 <- SelecionarPorIdade(35, 39, "TGI_35_39")
+TGI_40_44 <- SelecionarPorIdade(40, 44, "TGI_40_44")
+TGI_45_49 <- SelecionarPorIdade(45, 49, "TGI_45_49")
+
+TGI_50 <- dados_sinasc_2[Idade > 50,]
+TGI_50 <- as.data.frame(table(TGI_50$CODMUNRES))
+names(TGI_50) <- c("CODMUNRES", "TGI_50")
+
+IdadeFertil <- list(TGI_15_19, TGI_20_24, TGI_25_29, TGI_30_34, TGI_35_39, TGI_40_44, TGI_45_49)
+
+temp <- Reduce(function(x,y) merge(x,y, all = TRUE), IdadeFertil)
+temp[is.na(temp)] <- 0
+colsValidas <- sapply(temp, is.numeric)
+temp$TGIF <- rowSums(temp[, colsValidas])
+
+TGIF <- temp[, c("CODMUNRES", "TGIF")]
+
+# Idade materna e código de munícipio de residência são variáveis sem quaisquer NAs, o que nos permite omitir o na.rm = TRUE no argumento de aggregate
+# Podemos verificar isso com:
+# anyNA(dados_sinasc_2$IDADEMAE)
+# anyNA(dados_sinasc_2$CODMUNRES)
+
+MedidasDescritivasIM <- function(nomeVar, funcao, percentil = NULL){
+  # Tive que chamar as funções como funções genéricas, pois eu estava sendo impedindo de renomear as colunas do data frame
+  if(is.null(percentil)){
+    resultado <- aggregate(IDADEMAE ~ CODMUNRES, data = dados_sinasc_2, FUN = function(x) funcao(x, na.rm = TRUE))
+  }
+  else{
+    resultado <- aggregate(IDADEMAE ~ CODMUNRES, data = dados_sinasc_2, FUN = function(x) funcao(x, probs = percentil, na.rm = TRUE))
+  }
+  names(resultado) <- c("CODMUNRES", nomeVar)
+  resultado[[nomeVar]] <- round(resultado[[nomeVar]], digits=2) # Arredondando os resultados para 2 casas decimais já dentro da função
+  return(resultado)
+}
+
+IM_P25 <- MedidasDescritivasIM("IM_P25", quantile, 0.25)
+IM_P50 <- MedidasDescritivasIM("IM_P50", quantile, 0.5)
+IM_P75 <- MedidasDescritivasIM("IM_P75", quantile, 0.75)
+
+IM_MD <- MedidasDescritivasIM("IM_MD", mean)
+IM_MD$IM_MD <- round(IM_MD$IM_MD, digits=2)
+
+IM_DP <- MedidasDescritivasIM("IM_DP", sd)
+
+# Verificamos os indíces de cada escolaridade com:
+
+VerIndices <- function(variavel){
+  v <- levels(variavel)
+  for(i in 1:length(v)){
+    cat(i, " - ", v[i], "\n")
+  }
+}
+
+Escolaridade <- dados_sinasc_2$ESCMAE2010
+
+VerIndices(Escolaridade)
+
+SelecionarPorEscolaridade <- function(indiceEsc, nomeVar){
+  temp <- dados_sinasc_2[as.integer(Escolaridade) == indiceEsc,]
+  resultado <- as.data.frame(table(temp$CODMUNRES))
+  names(resultado) <- c("CODMUNRES", nomeVar)
+  return(resultado)
+}
+
+EM_S <- SelecionarPorEscolaridade(1, "EM_S")
+EM_FI <- SelecionarPorEscolaridade(2, "EM_FI")
+EM_FII <- SelecionarPorEscolaridade(3, "EM_FII")
+EM_M <- SelecionarPorEscolaridade(4, "EM_M")
+EM_SI <- SelecionarPorEscolaridade(5, "EM_SI")
+EM_SC <- SelecionarPorEscolaridade(6, "EM_SC")
+
+# Verificamos os indíces de cada cor com:
+CorMae <- dados_sinasc_2$RACACORMAE
+VerIndices(CorMae)
+
+SelecionarPorCor <- function(indiceCorMae, nomeVar){
+  temp <- dados_sinasc_2[as.integer(CorMae) == indiceCorMae,]
+  resultado <- as.data.frame(table(temp$CODMUNRES))
+  names(resultado) <- c("CODMUNRES", nomeVar)
+  return(resultado)
+}
+
+TGRC_B <- SelecionarPorCor(1, "TGRC_B")
+TGRC_PT <- SelecionarPorCor(2, "TGRC_PT")
+TGRC_A <- SelecionarPorCor(3, "TGRC_A")
+TGRC_PD <- SelecionarPorCor(4, "TGRC_PD")
+TGRC_I <- SelecionarPorCor(5, "TGRC_I")
+
+# Decidi criar uma versão mais genérica das funções de selecionar, pode ser útil
+
+SelecionarGenerico <- function(valor, variavel, nomeVar){
+  temp <- dados_sinasc_2[as.integer(variavel) == valor,]
+  resultado <- as.data.frame(table(temp$CODMUNRES))
+  names(resultado) <- c("CODMUNRES", nomeVar)
+  return(resultado)
+}
+
+EstCivil <- dados_sinasc_2$ESTCIV
+
+VerIndices(EstCivil)
+
+TGSC <- SelecionarGenerico(1, EstCivil, "TGSC")
+TGCC <- SelecionarGenerico(1, EstCivil, "TGCC")
+
+Paridade <- dados_sinasc_2$PARIDADE
+VerIndices(Paridade)
+
+TGPRI <- SelecionarGenerico(2, Paridade, "TGPRI")
+TGNPRI <- SelecionarGenerico(1, Paridade, "TGNPRI")
+
+# Variáveis sobre gestação
+
+Gravidez <- dados_sinasc_2$GRAVIDEZ
+VerIndices(Gravidez)
+
+TGU <- SelecionarGenerico(1, Gravidez, "TGU")
+
+TGG <- merge(SelecionarGenerico(2, Gravidez, "temp1"), SelecionarGenerico(3, Gravidez, "temp2"), all = TRUE)
+TGG[is.na(TGG)] <- 0
+TGG$TGG <- TGG$temp1 + TGG$temp2
+TGG <- TGG[, c("CODMUNRES", "TGG")]
+
+SelecionarPorFaixa <- function(lim_inf, lim_sup, variavel, nomeVar){
+  temp <- dados_sinasc_2[variavel >= lim_inf & variavel <= lim_sup,]
+  resultado <- as.data.frame(table(temp$CODMUNRES))
+  names(resultado) <- c("CODMUNRES", nomeVar)
+  return(resultado)
+}
+
+TempoGest <- dados_sinasc_2$SEMAGESTAC
+
+TGD_22 <- dados_sinasc_2[TempoGest < 22,]
+TGD_22 <- as.data.frame(table(TGD_22$CODMUNRES))
+names(TGD_22) <- c("CODMUNRES", "TGD_22")
+
+TGD_22_27 <- SelecionarPorFaixa(22, 27, TempoGest, "TGD_22_27")
+TGD_28_31 <- SelecionarPorFaixa(28, 31, TempoGest, "TGD_28_31")
+TGD_32_36 <- SelecionarPorFaixa(32, 36, TempoGest, "TGD_32_36")
+TGD_37_41 <- SelecionarPorFaixa(37, 41, TempoGest, "TGD_37_41")
+
+TGD_42 <- dados_sinasc_2[TempoGest >= 42,]
+TGD_42 <- as.data.frame(table(TGD_42$CODMUNRES))
+names(TGD_42) <- c("CODMUNRES", "TGD_42")
+
+TGD_PRT <- dados_sinasc_2[TempoGest < 37,]
+TGD_PRT <- as.data.frame(table(TGD_PRT$CODMUNRES))
+names(TGD_PRT) <- c("CODMUNRES", "TGD_PRT")
+
+TGD_AT <- SelecionarPorFaixa(37, 41, TempoGest, "TGD_AT")
+
+TGD_PST <- TGD_42
+names(TGD_PST) <- c("CODMUNRES", "TGD_PST")
+
+MedidasDescritivasDG <- function(nomeVar, funcao, percentil = NULL){
+  if(!is.null(percentil)){
+    resultado <- aggregate(SEMAGESTAC ~ CODMUNRES, data = dados_sinasc_2, FUN = function(x) funcao(x, probs=percentil, na.rm=TRUE))
+  }
+  else{
+    resultado <- aggregate(SEMAGESTAC ~ CODMUNRES, data = dados_sinasc_2, FUN = function(x) funcao(x, na.rm=TRUE))
+  }
+  names(resultado) <- c("CODMUNRES", nomeVar)
+  resultado[[nomeVar]] <- round(resultado[[nomeVar]], digits=2)
+  return(resultado)
+}
+
+DG_P25 <- MedidasDescritivasDG("DG_P25", quantile, 0.25)
+DG_P50 <- MedidasDescritivasDG("DG_P50", quantile, 0.5)
+DG_P75 <- MedidasDescritivasDG("DG_P75", quantile, 0.75)
+DG_MD <- MedidasDescritivasDG("DG_MD", mean)
+DG_DP <- MedidasDescritivasDG("DG_DP", sd)
+
+Kotelchuck <- dados_sinasc_2$KOTELCHUCK
+VerIndices(Kotelchuck)
+
+TKC_NR <- SelecionarGenerico(1, Kotelchuck, "TKC_NR")
+TKC_ID <- SelecionarGenerico(2, Kotelchuck, "TKC_ID")
+TKC_IT <- SelecionarGenerico(3, Kotelchuck, "TKC_IT")
+TKC_AD <- SelecionarGenerico(4, Kotelchuck, "TKC_AD")
+TKC_MAD <- SelecionarGenerico(5, Kotelchuck, "TKC_MAD")
+
+# Variáveis sobre o parto
+
+Pereg <- dados_sinasc_2$PEREG
+VerIndices(Pereg)
+
+TGPRG_S <- SelecionarGenerico(2, Pereg, "TGPRG_S")
+TGPRG_N <- SelecionarGenerico(1, Pereg, "TGPRG_N")
+
+Parto <- dados_sinasc_2$PARTO
+VerIndices(Parto)
+
+TPC <- SelecionarGenerico(2, Parto, "TPC")
+TPV <- SelecionarGenerico(1, Parto, "TPV")
+
+Posicao <- dados_sinasc_2$TPAPRESENT
+VerIndices(Posicao)
+
+TRAP_C <- SelecionarGenerico(1, Posicao, "TRAP_C")
+TRAP_P <- SelecionarGenerico(2, Posicao, "TRAP_P")
+TRAP_T <- SelecionarGenerico(3, Posicao, "TRAP_T")
+
+Robson <- dados_sinasc_2$TPROBSON
+
+TGROB_1 <- SelecionarGenerico(1, Robson, "TGROB_1")
+TGROB_2 <- SelecionarGenerico(2, Robson, "TGROB_2")
+TGROB_3 <- SelecionarGenerico(3, Robson, "TGROB_3")
+TGROB_4 <- SelecionarGenerico(4, Robson, "TGROB_4")
+TGROB_5 <- SelecionarGenerico(5, Robson, "TGROB_5")
+TGROB_6 <- SelecionarGenerico(6, Robson, "TGROB_6")
+TGROB_7 <- SelecionarGenerico(7, Robson, "TGROB_7")
+TGROB_8 <- SelecionarGenerico(8, Robson, "TGROB_8")
+TGROB_9 <- SelecionarGenerico(9, Robson, "TGROB_9")
+TGROB_10 <- SelecionarGenerico(10, Robson, "TGROB_10")
+
+Local <- dados_sinasc_2$LOCNASC
+VerIndices(Local)
+
+TNLOC_H <- SelecionarGenerico(1, Local, "TNLOC_H")
+TNLOC_ES <- SelecionarGenerico(2, Local, "TNLOC_ES")
+TNLOC_D <- SelecionarGenerico(3, Local, "TNLOC_D")
+TNLOC_O <- SelecionarGenerico(4, Local, "TNLOC_O")
+# TNLOC_AI <- SelecionarGenerico(5, Local, "TNLOC_AI") Deu erro, vamos verificar...
+
+aldeiaindigena <- dados_sinasc_2[dados_sinasc_2$LOCNASC == 5,]
+as.data.frame(table(aldeiaindigena$CODMUNRES)) # Não existe nenhum registro com LOCNASC == 5
+
+# Então podemos fazer:
+TNLOC_AI <- as.data.frame(table(dados_sinasc_2$CODMUNRES))
+TNLOC_AI$Freq <- 0
+names(TNLOC_AI) <- c("CODMUNRES", "TNLOC_AI")
+
+# Variáveis sobre os recém-nascidos
+
+Sexo <- dados_sinasc_2$SEXO
+VerIndices(Sexo)
+
+TRS_M <- SelecionarGenerico(1, Sexo, "TRS_M")
+TRS_F <- SelecionarGenerico(2, Sexo, "TRS_F")
+
+RacaCor <- dados_sinasc_2$RACACOR
+VerIndices(RacaCor)
+
+TRRC_B <- SelecionarGenerico(1, RacaCor, "TRRC_B")
+TRRC_PT <- SelecionarGenerico(2, RacaCor, "TRRC_PT")
+TRRC_A <- SelecionarGenerico(3, RacaCor, "TRRC_A")
+TRRC_PD <- SelecionarGenerico(4, RacaCor, "TRRC_PD")
+TRRC_I <- SelecionarGenerico(5, RacaCor, "TRRC_I")
+
+TRP_BP <- dados_sinasc_2[dados_sinasc_2$PESO < 2500,]
+TRP_BP <- as.data.frame(table(TRP_BP$CODMUNRES))
+names(TRP_BP) <- c("CODMUNRES", "TRP_BP")
+
+TRP_M <- dados_sinasc_2[dados_sinasc_2$PESO >= 4000,]
+TRP_M <- as.data.frame(table(TRP_M$CODMUNRES))
+names(TRP_M) <- c("CODMUNRES", "TRP_M")
+
+TRP_N <- dados_sinasc_2[dados_sinasc_2$PESO >= 2500 & dados_sinasc_2$PESO < 4000,]
+TRP_N <- as.data.frame(table(TRP_N$CODMUNRES))
+names(TRP_N) <- c("CODMUNRES", "TRP_N")
+
+# Decidi generalizar também as funções de medida descritiva
+
+MedidasDescritivasGenerica <- function(nomeVar, variavel, funcao, percentil = NULL){
+  x <- as.formula(paste(variavel, "CODMUNRES", sep=" ~ "))
+  if(!is.null(percentil)){
+    resultado <- aggregate(x, data = dados_sinasc_2, FUN = function(x) funcao(x, probs=percentil, na.rm=TRUE))
+  }
+  else{
+    resultado <- aggregate(x, data = dados_sinasc_2, FUN = function(x) funcao(x, na.rm=TRUE))
+  }
+  names(resultado) <- c("CODMUNRES", nomeVar)
+  resultado[[nomeVar]] <- round(resultado[[nomeVar]], digits=2)
+  return(resultado)
+}
+
+PESO_P25 <- MedidasDescritivasGenerica("PESO_P25", "PESO", quantile, 0.25)
+PESO_P50 <- MedidasDescritivasGenerica("PESO_P50", "PESO", quantile, 0.5)
+PESO_P75 <- MedidasDescritivasGenerica("PESO_P75", "PESO", quantile, 0.75)
+
+PESO_MD <- MedidasDescritivasGenerica("PESO_MD", "PESO", mean)
+PESO_DP <- MedidasDescritivasGenerica("PESO_DP", "PESO", sd)
+
+TRPIG_P <- dados_sinasc_2[dados_sinasc_2$F_PIG == "PIG",]
+TRPIG_P <- as.data.frame(table(TRPIG_P$CODMUNRES))
+names(TRPIG_P) <- c("CODMUNRES", "TRPIG_P")
+
+TRPIG_A <- dados_sinasc_2[dados_sinasc_2$F_PIG == "AIG",]
+TRPIG_A <- as.data.frame(table(TRPIG_A$CODMUNRES))
+names(TRPIG_A) <- c("CODMUNRES", "TRPIG_A")
+
+TRPIG_G <- dados_sinasc_2[dados_sinasc_2$F_PIG == "GIG",]
+TRPIG_G <- as.data.frame(table(TRPIG_G$CODMUNRES))
+names(TRPIG_G) <- c("CODMUNRES", "TRPIG_G")
+
+TRAPG5_B <- dados_sinasc_2[dados_sinasc_2$APGAR5 < 7,]
+TRAPG5_B <- as.data.frame(table(TRAPG5_B$CODMUNRES))
+names(TRAPG5_B) <- c("CODMUNRES", "TRAPG5_B")
+
+TRAPG5_N <- dados_sinasc_2[dados_sinasc_2$APGAR5 >= 7,]
+TRAPG5_N <- as.data.frame(table(TRAPG5_N$CODMUNRES))
+names(TRAPG5_N) <- c("CODMUNRES", "TRAPG5_N")
+
+APG5_MD <- MedidasDescritivasGenerica("APG5_MD", "APGAR5", mean)
+APG5_DP <- MedidasDescritivasGenerica("APG5_DP", "APGAR5", sd)
+
+Anomalia <- dados_sinasc_2$IDANOMAL
+VerIndices(Anomalia)
+
+TRAC <- SelecionarGenerico(1, Anomalia, "TRAC")
+TRSAC <- SelecionarGenerico(2, Anomalia, "TRSAC")
+
+variaveis_sinasc <- list(TN, TNRC, TNRCR, TGI_15, TGI_15_19, TGI_20_24, TGI_25_29, TGI_30_34, TGI_35_39, TGI_40_44, TGI_45_49, TGI_50, TGIF, IM_P25, IM_P50, IM_P75, IM_MD, IM_DP, EM_S, EM_FI, EM_FII, EM_M, EM_SI, EM_SC, TGRC_B, TGRC_PT, TGRC_A, TGRC_PD, TGRC_I, TGSC, TGCC, TGPRI, TGNPRI, TGU, TGG, TGD_22, TGD_22_27, TGD_28_31, TGD_32_36, TGD_37_41, TGD_42, TGD_PRT, TGD_AT, TGD_PST, DG_P25, DG_P50, DG_P75, DG_MD, DG_DP, TKC_NR, TKC_ID, TKC_IT, TKC_AD, TKC_MAD, TGPRG_S, TGPRG_N, TPV, TPC, TRAP_C, TRAP_P, TRAP_T, TGROB_1, TGROB_2, TGROB_3, TGROB_4, TGROB_5, TGROB_6, TGROB_7, TGROB_8, TGROB_9, TGROB_10, TNLOC_H, TNLOC_ES, TNLOC_D, TNLOC_O, TNLOC_AI, TRS_M, TRS_F, TRRC_B, TRRC_PT, TRRC_A, TRRC_PD, TRRC_I, TRP_BP, TRP_N, TRP_M, PESO_P25, PESO_P50, PESO_P75, PESO_MD, PESO_DP, TRPIG_P, TRPIG_A, TRPIG_G, TRAPG5_B, TRAPG5_N, APG5_MD, APG5_DP, TRAC, TRSAC)
+
+SINASC_MG <- Reduce(function(x,y) merge(x,y, all=TRUE, by = "CODMUNRES"), variaveis_sinasc)
+SINASC_MG[is.na(SINASC_MG)] <- 0
+
+UF <- SINASC_MG[1,]
+colsValidas <- sapply(SINASC_MG, is.numeric)
+UF[colsValidas] <- colSums(SINASC_MG[, colsValidas])
+UF$CODMUNRES <- "31"
+
+SINASC_MG <- rbind(UF, SINASC_MG)
+
+ANO <- 2016
+NIVEL <- "MUNICIPIO"
+
+SINASC_MG <- cbind(ANO, NIVEL, SINASC_MG)
+SINASC_MG$NIVEL[SINASC_MG$CODMUNRES == "31"] <- "UF"
 
 # Ao terminar a Tarefa 9 commit com a mensagem "script BDEM - SINASC - tarefas 1 a 9" e envie para o repositório Projeto_BDEM_2016
 
