@@ -933,6 +933,19 @@ write.csv2(SINASC_MG, file = "SINASC_MG.csv", row.names = FALSE)
 
 # Verificar se a leitura de todos os bancos foi feita corretamente e a estrutura dos dados
 
+dados_sidra_1 <- read.csv(file="população residente estimada - UF e municípios - 2016 - SIDRA - tabela_6579.csv", header=TRUE, sep=";")
+dados_sidra_2 <- read.csv(file="população residente censo 2010 - UF e municípios - total e por sexo - SIDRA - tabela_1552.csv", header=TRUE, sep=";")
+dados_sidra_3 <- read.csv(file="população residente censo 2010 - por faixa etária - UF - SIDRA - tabela_1552.csv", header=TRUE, sep=";")
+dados_sidra_4 <- read.csv(file="população residente censo 2010 - por faixa etária e sexo - municípios - SIDRA - tabela_1552.csv", header=TRUE, sep=";")
+
+summary(dados_sidra_1) # Erro em dados_sidra_1 devido à codificação de texto. Corrigindo...
+
+dados_sidra_1 <- read.csv(file="população residente estimada - UF e municípios - 2016 - SIDRA - tabela_6579.csv", header=TRUE, sep=";", encoding = "latin1")
+
+summary(dados_sidra_1) # Tudo correto agora
+summary(dados_sidra_2)
+summary(dados_sidra_3)
+summary(dados_sidra_4)
 
 # Ao terminar a Tarefa 1 commit com a mensagem "script BDEM - SIDRA - tarefa 1" e envie para o repositório Projeto_BDEM_2016
 
