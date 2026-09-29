@@ -1020,12 +1020,15 @@ NIVEL <- "MUNICIPIO"
 SIDRA_MG <- cbind(ANO, NIVEL, SIDRA_MG)
 SIDRA_MG$NIVEL[SIDRA_MG$CODMUNRES == "31"] <- "UF" # não existe o município 310000 aqui, enquanto no SIM e no SINASC esse município está lá..
 
+SIDRA_MG <- SIDRA_MG[, c("ANO", "NIVEL", "CODMUNRES", "POPRE_T", "POPRC_T", "POPRC_M", "POPRC_F", "POPRC_15", "POPRC_15_49", "POPRC_50", "POPRC_F_15", "POPRC_F_15_49", "POPRC_F_50")]
+
 # Ao terminar a Tarefa 4 commit com a mensagem "script BDEM - SIDRA - tarefas 1 a 4" e envie para o repositório Projeto_BDEM_2016
 
 
 # Tarefa 5:Exportar o banco de dados com o nome SIDRA_UF.csv (Exemplo: SIDRA_RJ.csv)
 # Ao terminar a Tarefa 5 commit com o comentário "dados SIDRA_UF 2016 e script - SIDRA - tarefas 1 a 5"  e envie para o repositório Projeto_BDEM_2016
 
+write.csv2(SIDRA_MG, file = "SIDRA_MG.csv", row.names = FALSE)
 
 ####################################
 # ETAPA 4: BANCOS DE DADOS DO ATLAS
