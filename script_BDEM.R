@@ -973,19 +973,19 @@ sidra_4 <- dados_sidra_4[substr(dados_sidra_4$CODMUNRES, 1, 2) == "31",]
 
 # Tarefa 4: Criar um banco de dados, de nome SIDRA_UF.csv (Exemplo: SIDRA_RJ.csv), contendo as variáveis listadas no arquivo “Variáveis - Projeto - Tarefa 4 - SIDRA.pdf”
 
-POPRE_T <- sidra_1[, c("CODUF", "POPRE_T")]
+POPRE_T <- sidra_1[, c("CODMUNRES", "POPRE_T")]
 names(POPRE_T) <- c("CODMUNRES", "POPRE_T")
 
-POPRC1 <- sidra_2[, c("CODUF", "POPRC_T", "POPRC_M", "POPRC_F")]
+POPRC1 <- sidra_2[, c("CODMUNRES", "POPRC_T", "POPRC_M", "POPRC_F")]
 names(POPRC1) <- c("CODMUNRES", "POPRC_T", "POPRC_M", "POPRC_F")
 
 temp <- sidra_4
 temp$FAIXA_ET <- ifelse(temp$F_IDADE %in% c("0 a 4 anos", "5 a 9 anos", "10 a 14 anos"), "<15",
   ifelse(temp$F_IDADE %in% c("15 a 19 anos", "20 a 24 anos", "25 a 29 anos", "30 a 34 anos", "35 a 39 anos", "40 a   44 anos", "45 a 49 anos"), "15-49", "50+"))
 
-POPRC2 <- aggregate(cbind(POP, POPM, POPF) ~ CODUF + FAIXA_ET, FUN=sum, data=temp, na.rm=TRUE)
+POPRC2 <- aggregate(cbind(POP, POPM, POPF) ~ CODMUNRES + FAIXA_ET, FUN=sum, data=temp, na.rm=TRUE)
 
-POPRC2 <- reshape(POPRC2[,c("CODUF", "FAIXA_ET", "POP", "POPF")], idvar = "CODUF", timevar = "FAIXA_ET", direction = "wide")
+POPRC2 <- reshape(POPRC2[,c("CODMUNRES", "FAIXA_ET", "POP", "POPF")], idvar = "CODMUNRES", timevar = "FAIXA_ET", direction = "wide")
 names(POPRC2) <- c("CODMUNRES", "POPRC_15", "POPRC_F_15", "POPRC_15_49", "POPRC_F_15_49", "POPRC_50", "POPRC_F_50")
 
 # UF
@@ -1018,7 +1018,8 @@ ANO <- 2016
 NIVEL <- "MUNICIPIO"
 
 SIDRA_MG <- cbind(ANO, NIVEL, SIDRA_MG)
-SIDRA_MG$NIVEL[SIDRA_MG$CODMUNRES == "31"] <- "UF" # não existe o município 310000 aqui, enquanto no SIM e no SINASC esse município está lá..
+SIDRA_MG$NIVEL[SIDRA_MG$CODMUNRES == "31"] <- "UF" 
+# Não existe o município 310000 aqui, enquanto no SIM e no SINASC esse município está lá..
 
 SIDRA_MG <- SIDRA_MG[, c("ANO", "NIVEL", "CODMUNRES", "POPRE_T", "POPRC_T", "POPRC_M", "POPRC_F", "POPRC_15", "POPRC_15_49", "POPRC_50", "POPRC_F_15", "POPRC_F_15_49", "POPRC_F_50")]
 
