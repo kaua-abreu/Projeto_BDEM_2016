@@ -1045,6 +1045,10 @@ write.csv2(SIDRA_MG, file = "SIDRA_MG.csv", row.names = FALSE)
 
 # Verificar se a leitura de todos os bancos foi feita corretamente e a estrutura dos dados
 
+codigos_IBGE_2010 <- read.csv(file = "códigos dos municípios - 2010.csv", header = TRUE, sep = ";")
+dados_atlas_1 <- read.csv(file = "IDHM - 2010 (CENSO) e 2016 (PNAD) - total e por sexo - UF - Atlas Brasil.csv", header = TRUE, sep = ";", encoding = "latin1") # Deu erro, vamos corrigir...
+dados_atlas_2 <- read.csv(file = "IDHM - 2010 - municípios - Atlas Brasil.csv", header = TRUE, sep = ";")
+
 # Ao terminar a Tarefa 1 commit com a mensagem "script BDEM - ATLAS - tarefa 1" e envie para o repositório Projeto_BDEM_2016
 
 
