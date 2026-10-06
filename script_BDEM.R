@@ -1076,31 +1076,94 @@ UF_codigo = data.frame(
 
 # Retirar de dados_atlas_1 a linha do Brasil e adicionar (com merge by UF) as colunas de UF_codigo
 
+dados_atlas_1 <- dados_atlas_1[dados_atlas_1$UF != "Brasil",]
+
+dados_atlas_1 <- merge(dados_atlas_1, UF_codigo, by = "UF", all = TRUE)
+
 # Criar o banco linha_estado somente com as linhas da UF e com as seguintes colunas:
 # ANO=2016, NIVEL=UF, CODMUNRES, IDHM_A, IDHM_CA, IDHM_CA_M e IDHM_CA_F 
 
+linha_estado <- dados_atlas_1[, c("CODUF", "IDHM_2016", "IDHM_2010", "IDHM_2010_M", "IDHM_2010_F")]
+names(linha_estado) <- c("CODMUNRES", "IDHM_A", "IDHM_CA", "IDHM_CA_M", "IDHM_CA_F")
+ANO <- 2016
+NIVEL <- "UF"
+
+linha_estado <- cbind(ANO, NIVEL, linha_estado)
+
 # Selecionar de linha_estado a UF da responsabilidade do aluno por CODMUNRES
 
+linha_UF <- linha_estado[linha_estado$CODMUNRES == "31",]
+
 # Criar em dados_atlas_2 a coluna com UF
+
+AcharParenteses <- function(x){
+  x <- strsplit(x, "")[[1]]
+  p1 <- NULL
+  p2 <- NULL
+  for(i in 1:length(x)){
+    if(x[i] == "(") p1 <- i
+    if(x[i] == ")") p2 <- i
+  }
+  return(c(p1, p2))
+}
+
+RetirarUF <- function(x) {
+  v <- AcharParenteses(x)
+  if(is.null(v)) return("UF")
+  return(substr(x, v[1]+1 ,v[2]-1))
+}
+
+RetirarNome <- function(x) {
+  v <- AcharParenteses(x)
+  if(is.null(v)) return(x)
+  return(substr(x, 1 ,v[1]-2))
+}
+
+dados_atlas_2$UF <- sapply(dados_atlas_2$município, RetirarUF)
+dados_atlas_2$município <- sapply(dados_atlas_2$município, RetirarNome)
 
 # Retirar (UF) da variável município
 
 # Acrescentar em codigos_IBGE_2010 a variável CODUF baseado nos dois primeiros dígitos de CODMUNRES
 
+codigos_IBGE_2010$CODUF <- substr(codigos_IBGE_2010$CODMUNRES, 1, 2)
+
 # Acrescentar a codigos_IBGE_2010 as variáveis de UF_codigo (merge by CODUF)
+
+codigos_IBGE_2010 <- merge(codigos_IBGE_2010, UF_codigo, by = "CODUF", all = TRUE)
 
 # Associar dados_atlas_2 a codigos_IBGE_2010 e nomear o novo arquivo por atlas_municipio
 # Neste caso o merge será by.x = c("município","UF") e by.y = c("município","SIGLA")
 
+atlas_municipio <- merge(dados_atlas_2, codigos_IBGE_2010, by.x = c("município","UF"), by.y = c("município","SIGLA"), all = TRUE)
+
 # Remover de atlas_municipio a coluna UF.y criada no merge
 
+atlas_municipio <- atlas_municipio[, 1:5]
+
 # Selecionar somente a UF de responsabilidade do aluno através dos dois primeiros dógitos de CODMUNRES
+
+atlas_municipio <- atlas_municipio[atlas_municipio$CODUF == "31",]
 
 # Criar banco ATLAS_MUNICIPIO com as linhas dos municípios e com as seguintes variáveis:
 # ANO=2016, NIVEL=MUNICIPIO, CODMUNRES, IDHM_A=NA, IDHM_CA, IDHM_CA_M=NA, IDHM_CA_F=NA
 
+ANO <- 2016
+NIVEL <- "MUNICIPIO"
+IDHM_A <- NA
+IDHM_CA_M <- NA
+IDHM_CA_F <- NA
+
+atlas_municipio <- atlas_municipio[, c("CODMUNRES", "IDHM_2010")]
+
+ATLAS_MUNICIPIO <- cbind(ANO, NIVEL, atlas_municipio, IDHM_A, IDHM_CA_M, IDHM_CA_F)
+ATLAS_MUNICIPIO <- ATLAS_MUNICIPIO[, c("ANO", "NIVEL", "CODMUNRES", "IDHM_A", "IDHM_2010", "IDHM_CA_M", "IDHM_CA_F")]
+
+names(ATLAS_MUNICIPIO) <- c("ANO", "NIVEL", "CODMUNRES", "IDHM_A", "IDHM_CA", "IDHM_CA_M", "IDHM_CA_F")
+
 # Criar banco final ATLAS_UF "juntando" os bancos linha_estado e ATLAS_MUNICIPIO
 
+ATLAS_MG <- rbind(linha_UF, ATLAS_MUNICIPIO)
 
 # Ao terminar a Tarefa 2 commit com a mensagem "script BDEM - ATLAS - tarefas 1 a 2" e envie para o repositório Projeto_BDEM_2016
 
