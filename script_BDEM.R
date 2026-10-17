@@ -1219,11 +1219,19 @@ dados_sinisa_1 <- dados_sinisa[substr(dados_sinisa$CODMUNRES, 1, 2) == "31",]
 
 # Ao terminar a Tarefa 3 commit com a mensagem "script BDEM - SINISA - tarefas 1 a 3" e envie para o repositório Projeto_BDEM_2016
 
+SINISA_MG <- dados_sinisa_1[, c("CODMUNRES", "POPR_RA", "POPR_RE")]
+UF <- SINISA_MG[1,]
+UF$CODMUNRES <- "31"
+UF$POPR_RA <- sum(dados_sinisa$POPR_RA, na.rm=TRUE)
+UF$POPR_RE <- sum(dados_sinisa$POPR_RE, na.rm=TRUE)
+SINISA_MG <- rbind(UF, SINISA_MG)
+NIVEL <- "MUNICIPIO"
+ANO <- 2016
+SINISA_MG <- cbind(ANO, NIVEL, SINISA_MG)
+SINISA_MG$NIVEL[SINISA_MG$CODMUNRES == 31] <- "UF"
 
 # Tarefa 4. Exportar o banco de dados com o nome SINISA_UF.csv (Exemplo: SINISA_RJ.csv)
 # Ao terminar a Tarefa 4 commit com o comentário "dados SINISA_UF 2016 e script - SINISA - tarefas 1 a 4"  e enviar para o repositório Projeto_BDEM_2016
-
-
 
 ################################
 # ETAPA 6: CRIAÇÃO DE BDEM_UF
