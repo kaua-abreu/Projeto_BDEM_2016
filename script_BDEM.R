@@ -1184,6 +1184,25 @@ write.csv2(ATLAS_MG, file="ATLAS_MG.csv", row.names=FALSE)
 # Atenção que o arquivo tem códigos e nomes de municípios e muitos NAs. 
 # Repare que os valores estão com o milhar indicado por ponto, o que não deve acontecer para o R não entender como decimal
 
+dados_sinisa <- read.csv("agua e esgoto - município - 2016.csv", header=TRUE, sep=";", encoding = "latin1")
+
+RemoverPonto <- function(x){
+  if(is.na(x)) return(NA)
+  x <- strsplit(x, "")[[1]]
+  if(length(x) == 0) return("")
+  semPonto <- NULL
+  for(i in 1:length(x)){
+    if(x[i] != ".") semPonto <- c(semPonto, x[i])
+  }
+  return(paste0(semPonto, collapse = ""))
+}
+
+dados_sinisa$POPR_RA <- sapply(dados_sinisa$POPR_RA, RemoverPonto)
+dados_sinisa$POPR_RE <- sapply(dados_sinisa$POPR_RE, RemoverPonto)
+
+dados_sinisa$POPR_RA <- as.integer(dados_sinisa$POPR_RA)
+dados_sinisa$POPR_RE <- as.integer(dados_sinisa$POPR_RE)
+
 # Verificar se a leitura de todos os bancos foi feita corretamente e a estrutura dos dados
 # Remover a pontuação de milhar e converter para formato numérico
 
