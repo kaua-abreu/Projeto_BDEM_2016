@@ -1252,6 +1252,23 @@ write.csv2(SINISA_MG, file = "SINISA_MG.csv", row.names=FALSE)
 
 # Ao terminar a Tarefa 1 commit com a mensagem "script BDEM - BDEM - tarefa 1" e envie para o repositório Projeto_BDEM_2016
 
+SIDRA_MG <- read.csv("SIDRA_MG.csv", header=TRUE, sep=";")
+ATLAS_MG <- read.csv("ATLAS_MG.csv", header=TRUE, sep=";")
+SINASC_MG <- read.csv("SINASC_MG.csv", header=TRUE, sep=";")
+SIM_MG <- read.csv("SIM_MG.csv", header=TRUE, sep=";")
+SINISA_MG <- read.csv("SINISA_MG.csv", header=TRUE, sep=";")
+
+ATLAS_MG2 <- ATLAS_MG
+ATLAS_MG2$CODMUNRES <- substr(ATLAS_MG2$CODMUNRES, 1, 6)
+
+SIDRA_MG2 <- SIDRA_MG
+SIDRA_MG2$CODMUNRES <- substr(SIDRA_MG2$CODMUNRES, 1, 6)
+
+lista <- list(SIDRA_MG2, ATLAS_MG2, SINASC_MG, SIM_MG, SINISA_MG)
+BDEM_MG <- Reduce(function(x,y) merge(x,y, all=TRUE, by=c("ANO", "NIVEL", "CODMUNRES")), lista)
+
+BDEM_MG <- BDEM_MG[!is.na(BDEM_MG$CODMUNRES),]
+BDEM_MG <- BDEM_MG[order(BDEM_MG$CODMUNRES),]
 
 # Tarefa 2: Inserir os seguintes indicadores epidemiológicos (com apenas dias casas decimais) no BDEM_UF:
 # TFG: Taxa de fecundidade geral
@@ -1268,7 +1285,26 @@ write.csv2(SINISA_MG, file = "SINISA_MG.csv", row.names=FALSE)
 
 # Ao terminar a Tarefa 2 commit com a mensagem "script BDEM - BDEM - tarefas 1 a 2" e envie para o repositório Projeto_BDEM_2016
 
+# Taxa geral de fecundidade
+BDEM_MG$TGF = round((BDEM_MG$TN / BDEM_MG$POPRC_F_15_49) * 1000, 2)
+# Taxa de mortalidade geral
+BDEM_MG$TMG = round((BDEM_MG$TO / BDEM_MG$POPRE_T) * 1000, 2)
+# Razão de mortalidade materna
+BDEM_MG$RMM = round((BDEM_MG$TO_MT / BDEM_MG$TN) * 100000, 2)
+# Taxa de mortalidade materna
+BDEM_MG$TMM = round((BDEM_MG$TO_MT / BDEM_MG$POPRC_F_15_49) * 100000, 2)
+# Taxa de mortalidade materna precoce
+BDEM_MG$TMM_P = round((BDEM_MG$TO_MT_P / BDEM_MG$POPRC_F_15_49) * 100000, 2)
+# Taxa de mortalidade neonatal
+BDEM_MG$TMN = round(((BDEM_MG$TO_NT_P + BDEM_MG$TO_NT_T) / BDEM_MG$TN) * 1000, 2)
+# Taxa de mortalidade neonatal precoce
+BDEM_MG$TMN_P = round((BDEM_MG$TO_NT_P / BDEM_MG$TN) * 1000, 2)
+# Taxa de mortalidade neonatal tardia
+BDEM_MG$TMN_T = round((BDEM_MG$TO_NT_T / BDEM_MG$TN) * 1000, 2)
+# Taxa de mortalidade infantil
+BDEM_MG$TMI = round(((BDEM_MG$TO_NT + BDEM_MG$TO_PNT) / BDEM_MG$TN) * 1000, 2)
 
 # Tarefa 3: Exportar o banco de dados com o nome BDEM_UF.csv (Exemplo: BDEM_RJ.csv)
 # Ao terminar a Tarefa 3 commit com o comentário "dados BDEM_UF 2016 e script - BDEM - tarefas 1 a 3"  e enviar para o repositório Projeto_BDEM_2016
- 
+
+write.csv2(BDEM_MG, file="BDEM_MG.csv", row.names=FALSE)
